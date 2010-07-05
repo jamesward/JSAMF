@@ -1,0 +1,71 @@
+<html>
+<head>
+  <script type="text/javascript" src="json2.js"></script>
+  <script type="text/javascript" src="amf.js"></script>
+  <script type="text/javascript">
+    var url = "TestServlet";
+
+    var req;
+
+    function getAMF(command)
+    {
+      if (window.XMLHttpRequest)
+      {
+        req = new XMLHttpRequest();
+      }
+      else if (window.ActiveXObject)
+      {
+        req = new ActiveXObject("Microsoft.XMLHTTP");
+      }
+
+      req.onreadystatechange = processReqChange;
+      //XHR binary charset opt by Marcus Granado 2006 [http://mgran.blogspot.com]
+      req.overrideMimeType('text/plain; charset=x-user-defined');
+      req.open("GET", url + "?command=" + command, true);
+      req.send(null);
+    }
+
+    function processReqChange()
+    {
+      if (req.readyState == 4)
+      {
+        if (req.status == 200)
+        {
+          var res;
+          if (req.responseStream != undefined)
+          {
+            res = req.responseStream; // for IE
+          }
+          else
+          {
+            res = req.responseText;
+          }
+
+          var o = decodeAMF(res).messages[0].body;
+
+          document.getElementById("output").innerHTML = JSON.stringify(o);
+        }
+        else
+        {
+          alert("There was a problem retrieving the data:\n" + req.statusText);
+        }
+      }
+    }
+  </script>
+</head>
+<body>
+
+  <button onclick="getAMF('getTestString')" type="button">getTestString</button>
+
+  <button onclick="getAMF('getTestObject')" type="button">getTestObject</button>
+
+  <button onclick="getAMF('getTestArrayOfObjects')" type="button">getTestArrayOfObjects</button>
+
+  <button onclick="getAMF('getTestHashtable')" type="button">getTestHashtable</button>
+
+  <div id="output">
+
+  </div>
+
+</body>
+</html>
