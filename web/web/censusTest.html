@@ -1,0 +1,101 @@
+<html>
+<head>
+  <script type="text/javascript" src="json2.js"></script>
+  <script type="text/javascript" src="amf.js"></script>
+  <script type="text/vbscript">
+          Function BinaryToArray(Binary)
+            Dim i
+            ReDim byteArray(LenB(Binary))
+            For i = 1 To LenB(Binary)
+              byteArray(i-1) = AscB(MidB(Binary, i, 1))
+            Next
+            BinaryToArray = byteArray
+          End Function
+  </script>
+  <script type="text/javascript">
+    var url = "CensusProxy";
+
+    var req;
+
+    function getAMF()
+    {
+      document.getElementById("output").innerHTML = "<h1>Fetching AMF encoded data using JavaScript from:</h1>" + url + "<br/>";
+
+      if (window.ActiveXObject)
+      {
+        req = new ActiveXObject("Microsoft.XMLHTTP");
+      }
+      else if (window.XMLHttpRequest)
+      {
+        req = new XMLHttpRequest();
+        //XHR binary charset opt by Marcus Granado 2006 [http://mgran.blogspot.com]
+        req.overrideMimeType('text/plain; charset=x-user-defined');
+      }
+
+      req.onreadystatechange = processReqChange;
+      req.open("GET", url, true);
+      req.send(null);
+    }
+
+    function processReqChange()
+    {
+      if (req.readyState == 4)
+      {
+        if (req.status == 200)
+        {
+          var res;
+          if (req.responseBody != undefined)
+          {
+            res = "";
+            var a = BinaryToArray(req.responseBody).toArray();
+            for (var i = 0; i < a.length; i++)
+            {
+              res += String.fromCharCode(a[i]);
+            }
+          }
+          else
+          {
+            res = req.responseText;
+          }
+
+          var o = decodeAMF(res).messages[0].body;
+
+          var bytes = new a3d.ByteArray(res, a3d.Endian.BIG);
+
+          var tHtml = "<h2>Decoded data in a table:</h2><table width='100%' cellpadding='4' cellspacing='0' border='1'>";
+          for (var i = 0; i < o.length; i++)
+          {
+            tHtml += "<tr>";
+            tHtml += "<td>" + o[i].id + "</td>";
+            tHtml += "<td>" + o[i].age + "</td>";
+            tHtml += "<td>" + o[i].education + "</td>";
+            tHtml += "<td>" + o[i].classOfWorker + "</td>";
+            tHtml += "<td>" + o[i].maritalStatus + "</td>";
+            tHtml += "<td>" + o[i].race + "</td>";
+            tHtml += "<td>" + o[i].sex + "</td>";
+            tHtml += "</tr>";
+          }
+          tHtml += "</table>";
+
+          document.getElementById("output").innerHTML += "<br/>" + tHtml;
+
+          document.getElementById("output").innerHTML += "<br/><h2>hexdump of AMF data:</h2><pre>" + dumpHex(bytes) + "</pre>";
+
+          document.getElementById("output").innerHTML += "<br/><h2>JSON Data representation:</h2>" + JSON.stringify(o);
+        }
+        else
+        {
+          alert("There was a problem retrieving the data:\n" + req.statusText);
+        }
+      }
+    }
+  </script>
+</head>
+<body onload="getAMF()">
+
+  <div id="output">
+
+  </div>
+
+</body>
+</html>
