@@ -1017,11 +1017,11 @@ a3d.ByteArray = Class.extend({
         {
           for (; ;)
           {
-            var name = this.readString();
+            var name = this.readStringAMF3();
             if (name == null || name.length == 0) break;
 
             var value = this.readObject();
-            o[propName] = value;
+            o[name] = value;
           }
         }
       }
