@@ -1,0 +1,23 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="web:war exploded">
+    <output-path>$PROJECT_DIR$/out/artifacts/jsamf.war</output-path>
+    <root id="root">
+      <element id="javaee-facet-resources" facet="web/web/Web" />
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="web" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="file-copy" path="$PROJECT_DIR$/web/web/WEB-INF/lib/flex-messaging-common.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/web/web/WEB-INF/lib/flex-messaging-core.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/web/web/WEB-INF/lib/commons-httpclient-3.0.1.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/web/web/WEB-INF/lib/commons-logging.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/web/web/WEB-INF/lib/flex-messaging-remoting.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/web/web/WEB-INF/lib/flex-messaging-opt.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/web/web/WEB-INF/lib/flex-messaging-proxy.jar" />
+          <element id="file-copy" path="$PROJECT_DIR$/web/web/WEB-INF/lib/commons-codec-1.3.jar" />
+        </element>
+      </element>
+    </root>
+  </artifact>
+</component>

@@ -987,6 +987,8 @@ a3d.ByteArray = Class.extend({
     {
       var o = new Object();
 
+      this.objectTable.push(o);
+
       var ref = this.readUInt29();
 
       if ((ref & 1) == 0)
@@ -1026,8 +1028,6 @@ a3d.ByteArray = Class.extend({
         }
       }
 
-      this.objectTable.push(o);
-
       return o;
     }
     else if (marker == a3d.Amf3Types.kAvmPlusXmlType)
@@ -1061,12 +1061,12 @@ a3d.ByteArray = Class.extend({
 
       var ba = new a3d.ByteArray();
 
+      this.objectTable.push(ba);
+
       for (var i = 0; i < len; i++)
       {
         ba.writeByte(this.readByte());
       }
-
-      this.objectTable.push(ba);
 
       return ba;
     }
