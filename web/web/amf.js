@@ -436,7 +436,7 @@ a3d.ByteArray = Class.extend({
 
   , writeByte: function(byte)
   {
-    this.data += byte;
+    this.data.push(byte);
   }
 
   , readBool: function()
