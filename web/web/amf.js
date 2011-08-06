@@ -353,8 +353,8 @@ a3d.AMFPacket = Class.extend({
   , init: function(version)
   {
     this.version = (version !== undefined) ? version : 0;
-    this.headers = new Array();
-    this.messages = new Array();
+    this.headers = [];
+    this.messages = [];
   }
 });
 
@@ -380,7 +380,7 @@ a3d.AMFHeader = Class.extend({
  * @extends Class
  */
 a3d.ByteArray = Class.extend({
-  data: ''
+  data: []
   , length: 0
   , pos: 0
   , pow: Math.pow
@@ -395,13 +395,19 @@ a3d.ByteArray = Class.extend({
   /** @constructor */
   , init: function(data, endian)
   {
-    this.data = (data !== undefined) ? data : '';
+    if (typeof data == "string") {
+      data = data.split("").map(function(c) {
+        return c.charCodeAt(0);
+      });
+    }
+
+    this.data = (data !== undefined) ? data : [];
     if (endian !== undefined) this.endian = endian;
     this.length = data.length;
 
-    this.stringTable = new Array();
-    this.objectTable = new Array();
-    this.traitTable = new Array();
+    this.stringTable = [];
+    this.objectTable = [];
+    this.traitTable = [];
 
     // Cache the function pointers based on endianness.
     // This avoids doing an if-statement in every function call.
@@ -424,7 +430,7 @@ a3d.ByteArray = Class.extend({
 
   , readByte: function()
   {
-    var cc = this.data.charCodeAt(this.pos++);
+    var cc = this.data[this.pos++];
     return (cc & 0xFF);
   }
 
@@ -435,7 +441,7 @@ a3d.ByteArray = Class.extend({
 
   , readBool: function()
   {
-    return (this.data.charCodeAt(this.pos++) & 0xFF) ? true : false;
+    return (this.data[this.pos++] & 0xFF) ? true : false;
   }
 
   , readUInt30BE: function()
@@ -454,42 +460,42 @@ a3d.ByteArray = Class.extend({
   , readUInt32BE: function()
   {
     var data = this.data, pos = (this.pos += 4) - 4;
-    return  ((data.charCodeAt(pos) & 0xFF) << 24) |
-            ((data.charCodeAt(++pos) & 0xFF) << 16) |
-            ((data.charCodeAt(++pos) & 0xFF) << 8) |
-            (data.charCodeAt(++pos) & 0xFF);
+    return  ((data[pos] & 0xFF) << 24) |
+            ((data[++pos] & 0xFF) << 16) |
+            ((data[++pos] & 0xFF) << 8) |
+            (data[++pos] & 0xFF);
   }
   , readInt32BE: function()
   {
     var data = this.data, pos = (this.pos += 4) - 4;
-    var x = ((data.charCodeAt(pos) & 0xFF) << 24) |
-            ((data.charCodeAt(++pos) & 0xFF) << 16) |
-            ((data.charCodeAt(++pos) & 0xFF) << 8) |
-            (data.charCodeAt(++pos) & 0xFF);
+    var x = ((data[pos] & 0xFF) << 24) |
+            ((data[++pos] & 0xFF) << 16) |
+            ((data[++pos] & 0xFF) << 8) |
+            (data[++pos] & 0xFF);
     return (x >= 2147483648) ? x - 4294967296 : x;
   }
 
   , readUInt16BE: function()
   {
     var data = this.data, pos = (this.pos += 2) - 2;
-    return  ((data.charCodeAt(pos) & 0xFF) << 8) |
-            (data.charCodeAt(++pos) & 0xFF);
+    return  ((data[pos] & 0xFF) << 8) |
+            (data[++pos] & 0xFF);
   }
   , readInt16BE: function()
   {
     var data = this.data, pos = (this.pos += 2) - 2;
-    var x = ((data.charCodeAt(pos) & 0xFF) << 8) |
-            (data.charCodeAt(++pos) & 0xFF);
+    var x = ((data[pos] & 0xFF) << 8) |
+            (data[++pos] & 0xFF);
     return (x >= 32768) ? x - 65536 : x;
   }
 
   , readFloat32BE: function()
   {
     var data = this.data, pos = (this.pos += 4) - 4;
-    var b1 = data.charCodeAt(pos) & 0xFF,
-            b2 = data.charCodeAt(++pos) & 0xFF,
-            b3 = data.charCodeAt(++pos) & 0xFF,
-            b4 = data.charCodeAt(++pos) & 0xFF;
+    var b1 = data[pos] & 0xFF,
+            b2 = data[++pos] & 0xFF,
+            b3 = data[++pos] & 0xFF,
+            b4 = data[++pos] & 0xFF;
     var sign = 1 - ((b1 >> 7) << 1);                   // sign = bit 0
     var exp = (((b1 << 1) & 0xFF) | (b2 >> 7)) - 127;  // exponent = bits 1..8
     var sig = ((b2 & 0x7F) << 16) | (b3 << 8) | b4;    // significand = bits 9..31
@@ -596,42 +602,42 @@ a3d.ByteArray = Class.extend({
   , readUInt32LE: function()
   {
     var data = this.data, pos = (this.pos += 4);
-    return  ((data.charCodeAt(--pos) & 0xFF) << 24) |
-            ((data.charCodeAt(--pos) & 0xFF) << 16) |
-            ((data.charCodeAt(--pos) & 0xFF) << 8) |
-            (data.charCodeAt(--pos) & 0xFF);
+    return  ((data[--pos] & 0xFF) << 24) |
+            ((data[--pos] & 0xFF) << 16) |
+            ((data[--pos] & 0xFF) << 8) |
+            (data[--pos] & 0xFF);
   }
   , readInt32LE: function()
   {
     var data = this.data, pos = (this.pos += 4);
-    var x = ((data.charCodeAt(--pos) & 0xFF) << 24) |
-            ((data.charCodeAt(--pos) & 0xFF) << 16) |
-            ((data.charCodeAt(--pos) & 0xFF) << 8) |
-            (data.charCodeAt(--pos) & 0xFF);
+    var x = ((data[--pos] & 0xFF) << 24) |
+            ((data[--pos] & 0xFF) << 16) |
+            ((data[--pos] & 0xFF) << 8) |
+            (data[--pos] & 0xFF);
     return (x >= 2147483648) ? x - 4294967296 : x;
   }
 
   , readUInt16LE: function()
   {
     var data = this.data, pos = (this.pos += 2);
-    return  ((data.charCodeAt(--pos) & 0xFF) << 8) |
-            (data.charCodeAt(--pos) & 0xFF);
+    return  ((data[--pos] & 0xFF) << 8) |
+            (data[--pos] & 0xFF);
   }
   , readInt16LE: function()
   {
     var data = this.data, pos = (this.pos += 2);
-    var x = ((data.charCodeAt(--pos) & 0xFF) << 8) |
-            (data.charCodeAt(--pos) & 0xFF);
+    var x = ((data[--pos] & 0xFF) << 8) |
+            (data[--pos] & 0xFF);
     return (x >= 32768) ? x - 65536 : x;
   }
 
   , readFloat32LE: function()
   {
     var data = this.data, pos = (this.pos += 4);
-    var b1 = data.charCodeAt(--pos) & 0xFF,
-            b2 = data.charCodeAt(--pos) & 0xFF,
-            b3 = data.charCodeAt(--pos) & 0xFF,
-            b4 = data.charCodeAt(--pos) & 0xFF;
+    var b1 = data[--pos] & 0xFF,
+            b2 = data[--pos] & 0xFF,
+            b3 = data[--pos] & 0xFF,
+            b4 = data[--pos] & 0xFF;
     var sign = 1 - ((b1 >> 7) << 1);                   // sign = bit 0
     var exp = (((b1 << 1) & 0xFF) | (b2 >> 7)) - 127;  // exponent = bits 1..8
     var sig = ((b2 & 0x7F) << 16) | (b3 << 8) | b4;    // significand = bits 9..31
@@ -643,14 +649,14 @@ a3d.ByteArray = Class.extend({
   , readFloat64LE: function()
   {
     var data = this.data, pos = (this.pos += 8);
-    var b1 = data.charCodeAt(--pos) & 0xFF,
-            b2 = data.charCodeAt(--pos) & 0xFF,
-            b3 = data.charCodeAt(--pos) & 0xFF,
-            b4 = data.charCodeAt(--pos) & 0xFF,
-            b5 = data.charCodeAt(--pos) & 0xFF,
-            b6 = data.charCodeAt(--pos) & 0xFF,
-            b7 = data.charCodeAt(--pos) & 0xFF,
-            b8 = data.charCodeAt(--pos) & 0xFF;
+    var b1 = data[--pos] & 0xFF,
+            b2 = data[--pos] & 0xFF,
+            b3 = data[--pos] & 0xFF,
+            b4 = data[--pos] & 0xFF,
+            b5 = data[--pos] & 0xFF,
+            b6 = data[--pos] & 0xFF,
+            b7 = data[--pos] & 0xFF,
+            b8 = data[--pos] & 0xFF;
     var sign = 1 - ((b1 >> 7) << 1);									// sign = bit 0
     var exp = (((b1 << 4) & 0x7FF) | (b2 >> 4)) - 1023;					// exponent = bits 1..11
 
@@ -742,8 +748,8 @@ a3d.ByteArray = Class.extend({
 
   , readTraits: function(ref)
   {
-    var traitInfo = new Object();
-    traitInfo.properties = new Array();
+    var traitInfo = {};
+    traitInfo.properties = [];
 
     if ((ref & 3) == 1)
       return this.traitTable[(ref >> 2)];
@@ -801,7 +807,7 @@ a3d.ByteArray = Class.extend({
     }
     else if ((marker == a3d.Amf0Types.kObjectType) || (marker == a3d.Amf0Types.kECMAArrayType))
     {
-      var o = new Object();
+      var o = {};
 
       var ismixed = (marker == 0x08);
 
@@ -820,7 +826,7 @@ a3d.ByteArray = Class.extend({
 
         this.pos--;
 
-        o[name] = readObject();
+        o[name] = this.readObject();
       }
 
       return o;
@@ -829,7 +835,7 @@ a3d.ByteArray = Class.extend({
     {
       var size = this.readInt();
 
-      var a = new Array();
+      var a = [];
 
       for (var i = 0; i < size; ++i)
       {
@@ -840,7 +846,7 @@ a3d.ByteArray = Class.extend({
     }
     else if (marker == a3d.Amf0Types.kTypedObjectType)
     {
-      var o = new Object();
+      var o = {};
 
       var typeName = this.readUTF();
       
@@ -955,7 +961,7 @@ a3d.ByteArray = Class.extend({
 
       if (key == "")
       {
-        var a = new Array();
+        var a = [];
 
         for (var i = 0; i < len; i++)
         {
@@ -985,7 +991,7 @@ a3d.ByteArray = Class.extend({
     }
     else if (marker == a3d.Amf3Types.kObjectType)
     {
-      var o = new Object();
+      var o = {};
 
       this.objectTable.push(o);
 
