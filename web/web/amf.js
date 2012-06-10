@@ -809,7 +809,7 @@ a3d.ByteArray = Class.extend({
     {
       var o = {};
 
-      var ismixed = (marker == 0x08);
+      var ismixed = (marker == a3d.Amf0Types.kECMAArrayType);
 
       var size = null;
       if (ismixed)
@@ -821,7 +821,7 @@ a3d.ByteArray = Class.extend({
         var c2 = this.readByte();
         var name = this.readString((c1 << 8) | c2);
         var k = this.readByte();
-        if (k == 0x09)
+        if (k == a3d.Amf0Types.kObjectEndType)
           break;
 
         this.pos--;
